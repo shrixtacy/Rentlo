@@ -33,6 +33,27 @@ Rentlo's REST API follows standard REST principles, using standard HTTP verbs (`
 }
 ```
 
+### Quick API Directory & How It Works
+
+| Module | API Name | Method & Endpoint | How It Works In Short | Auth |
+| :--- | :--- | :--- | :--- | :--- |
+| **Auth** | Register User | `POST /api/auth/register` | Creates a new account, hashes password with bcrypt, and returns JWT. | Public |
+| **Auth** | Login User | `POST /api/auth/login` | Verifies user credentials and issues a signed JWT session token. | Public |
+| **User** | Upload KYC Doc | `POST /api/users/kyc/upload` | Uploads ID card to Cloudinary and marks KYC verification status as `PENDING`. | Bearer JWT |
+| **Listings** | Search & Filter Listings | `GET /api/listings` | Queries items by category, price, keywords, and geolocation radius. | Public |
+| **Listings** | Create Listing | `POST /api/listings` | Allows verified owners to post rentable items with prices, deposit, and photos. | Owner |
+| **Listings** | Check Availability | `GET /api/listings/:id/availability` | Checks if calendar dates are open and calculates rent + deposit breakdown. | Public |
+| **Bookings** | Create Booking Request | `POST /api/bookings` | Renter books dates; blocks date overlap and sends approval request to owner. | Renter |
+| **Bookings** | Approve / Reject Booking | `PATCH /api/bookings/:id/status` | Owner accepts or declines; approving opens a 24-hour payment window. | Owner |
+| **Bookings** | Handover Inspection | `POST /api/bookings/:id/handover` | Records pickup photos & checklist to verify start of rental (`ACTIVE`). | Both |
+| **Bookings** | Return Inspection | `POST /api/bookings/:id/return` | Records return photos and item condition upon return (`RETURNED`). | Owner |
+| **Payments** | Create Razorpay Order | `POST /api/payments/order` | Generates a Razorpay order combining daily rental fee + refundable deposit. | Renter |
+| **Payments** | Verify Signature | `POST /api/payments/verify` | Validates HMAC signature from Razorpay and transitions booking to `CONFIRMED`. | Renter |
+| **Payments** | Razorpay Webhook | `POST /api/payments/webhook` | Handles async events from Razorpay (capture, payout, refund). | Webhook Secret |
+| **Disputes** | Raise Damage Dispute | `POST /api/disputes` | Owner reports item damage/theft with photo proof to pause deposit refund. | Owner |
+| **Disputes** | Admin Resolve Dispute | `PATCH /api/disputes/:id/resolve` | Admin adjudicates photos, deducts from deposit, and releases remaining funds. | Admin |
+| **Reviews** | Submit Review | `POST /api/reviews` | Submits 1-5 star rating and feedback for completed rentals to build trust. | Verified User |
+
 ---
 
 ## 2. System Workflows
