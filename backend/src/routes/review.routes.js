@@ -1,9 +1,13 @@
 import { Router } from 'express';
+import {
+  submitReviewController,
+  getUserReviewsController,
+} from '../controllers/review.controller.js';
+import { verifyToken } from '../middlewares/auth.middleware.js';
+
 const router = Router();
 
-// Placeholder route
-router.get('/', (req, res) => {
-    res.json({ success: true, message: 'review route working' });
-});
+router.post('/', verifyToken, submitReviewController);
+router.get('/users/:id', getUserReviewsController);
 
 export default router;
