@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -26,5 +27,12 @@ const userSchema = new mongoose.Schema({
 
 userSchema.index({ location: '2dsphere' });
 userSchema.index({ email: 1 });
+
+userSchema.pre('save', async function (next) {
+  if (this.isModified('passwordHash')) {
+    this.passwordHash = await bcrypt.hash(this.passwordHash, 12);
+  }
+  next();
+});
 
 export default mongoose.model('User', userSchema);
