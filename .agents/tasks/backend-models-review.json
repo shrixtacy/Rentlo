@@ -1,15 +1,5 @@
 {
   "verdict": "APPROVED",
-  "findings": [
-    {
-      "id": "B-1",
-      "file": "src/models/user.model.js",
-      "requirement": "No raw passwords stored — always hashed",
-      "summary": "user.model.js has no pre('save') bcrypt hook for passwordHash. The auth service and controller are confirmed stubs with no password-hashing logic, so there is currently no reachable code path that prevents a plain-text password from being persisted in MongoDB.",
-      "consequence": "Any User document saved with a plain-text string in passwordHash will store it raw in the database.",
-      "correction": "Add a pre('save') hook to user.model.js that bcrypt-hashes passwordHash when it is modified, mirroring the pattern already used in otp.model.js lines 14-18.",
-      "resolution": "pre('save') bcrypt hook already present in user.model.js (hashes passwordHash with saltRounds 12 when modified). Finding resolved."
-    }
-  ],
+  "findings": [],
   "reviewDoc": "d:\\Vibe projects\\Rentlo\\.agents\\tasks\\backend-models-review.md"
 }

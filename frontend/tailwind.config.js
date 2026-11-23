@@ -1,21 +1,19 @@
-/** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
-        rentlo: {
-          primary: '#1E3A8A',    // Deep Trust Blue
-          secondary: '#F97316',  // Energy Orange
-          accent: '#10B981',     // Success Green
-          dark: '#0F172A',
-          light: '#F8FAFC'
-        }
-      }
+        primary: '#A8E63D',
+        background: '#F8F9FA',
+        surface: '#FFFFFF',
+        dark: '#0F172A',
+        muted: '#64748B',
+        success: '#22C55E',
+        error: '#EF4444',
+      },
+      fontFamily: { inter: ['Inter', 'sans-serif'] },
+      borderRadius: { '2xl': '1rem', '3xl': '1.5rem' },
     },
   },
   plugins: [],
-}
+};
