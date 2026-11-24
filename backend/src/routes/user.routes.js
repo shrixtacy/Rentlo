@@ -17,7 +17,7 @@ import {
 const router = Router();
 
 router.get('/profile', verifyToken, getProfile);
-router.patch('/', verifyToken, updateProfile);
+router.patch('/profile', verifyToken, updateProfile);
 router.post('/avatar', verifyToken, uploadAvatarMiddleware, uploadAvatarController);
 router.post('/kyc/upload', verifyToken, uploadKYCMiddleware, uploadKYCController);
 router.get('/listings', verifyToken, getMyListings);
