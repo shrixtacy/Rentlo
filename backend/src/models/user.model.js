@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.index({ location: '2dsphere' });
-userSchema.index({ email: 1 });
+// email index is already created by unique:true on the field — no duplicate needed
 
 userSchema.pre('save', async function (next) {
   if (this.isModified('passwordHash')) {
