@@ -16,10 +16,15 @@ export const getProfile = asyncHandler(async (req, res) => {
 });
 
 export const updateProfile = asyncHandler(async (req, res) => {
-  const { name, phone, address } = req.body;
+  const { name, phone, address, role } = req.body;
+  const updateFields = {};
+  if (name !== undefined) updateFields.name = name;
+  if (phone !== undefined) updateFields.phone = phone;
+  if (address !== undefined) updateFields.address = address;
+  if (role !== undefined) updateFields.role = role;
   const user = await User.findByIdAndUpdate(
     req.user.id,
-    { name, phone, address },
+    updateFields,
     { new: true, runValidators: true }
   ).select('-passwordHash');
   return successResponse(res, 200, 'Profile updated', { user });
