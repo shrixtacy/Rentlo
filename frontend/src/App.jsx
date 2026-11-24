@@ -1,34 +1,114 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { SocketProvider } from './context/SocketContext';
+import Layout from './components/layout/Layout';
+import Home from './pages/Home';
+import Explore from './pages/Explore';
+import Rentals from './pages/Rentals';
+import Messages from './pages/Messages';
+import Profile from './pages/Profile';
+import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
+import Setup from './pages/auth/Setup';
+import CreateListing from './pages/listings/CreateListing';
+import ListingDetail from './pages/listings/ListingDetail';
+import Spinner from './components/ui/Spinner';
 
-function App() {
-  return (
-    <BrowserRouter>
-      <div className="min-h-screen flex flex-col bg-slate-50">
-        <header className="bg-blue-900 text-white px-6 py-4 flex justify-between items-center shadow-md">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl font-bold tracking-tight">RENTLO</span>
-            <span className="text-xs bg-orange-500 text-white px-2 py-0.5 rounded-full uppercase font-semibold">PWA</span>
-          </div>
-          <nav className="flex gap-4 text-sm font-medium">
-            <Link to="/" className="hover:text-orange-400">Explore</Link>
-            <Link to="/bookings" className="hover:text-orange-400">My Bookings</Link>
-            <Link to="/dashboard" className="hover:text-orange-400">Dashboard</Link>
-            <Link to="/login" className="bg-orange-500 hover:bg-orange-600 px-3 py-1.5 rounded-md text-white">Login</Link>
-          </nav>
-        </header>
-
-        <main className="flex-1 max-w-7xl w-full mx-auto p-6">
-          <Routes>
-            <Route path="/" element={<h2 className="text-2xl font-bold text-slate-800">Explore Items Available to Rent</h2>} />
-            <Route path="/bookings" element={<h2 className="text-2xl font-bold text-slate-800">Your Active & Past Bookings</h2>} />
-            <Route path="/dashboard" element={<h2 className="text-2xl font-bold text-slate-800">Owner & Renter Dashboard</h2>} />
-            <Route path="/login" element={<h2 className="text-2xl font-bold text-slate-800">Login / Register to Rentlo</h2>} />
-          </Routes>
-        </main>
+function ProtectedRoute({ children }) {
+  const { isAuthenticated, isLoading } = useAuth();
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Spinner />
       </div>
-    </BrowserRouter>
+    );
+  }
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  return children;
+}
+
+// Minimal stub for edit listing
+function EditListingStub() {
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold text-dark">Edit Listing</h1>
+      <p className="text-muted mt-2">Coming soon.</p>
+    </div>
   );
 }
 
-export default App;
+function AppRoutes() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Spinner />
+      </div>
+    );
+  }
+
+  return (
+    <Routes>
+      {/* Public auth routes */}
+      <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <Login />} />
+      <Route path="/register" element={isAuthenticated ? <Navigate to="/" replace /> : <Register />} />
+
+      {/* Protected setup route (outside Layout) */}
+      <Route
+        path="/setup"
+        element={
+          <ProtectedRoute>
+            <Setup />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Public listing detail (no ProtectedRoute) */}
+      <Route
+        path="/listings/:id"
+        element={
+          <SocketProvider>
+            <Layout>
+              <ListingDetail />
+            </Layout>
+          </SocketProvider>
+        }
+      />
+
+      {/* Protected app routes inside layout */}
+      <Route
+        path="/*"
+        element={
+          <ProtectedRoute>
+            <SocketProvider>
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/explore" element={<Explore />} />
+                  <Route path="/rentals" element={<Rentals />} />
+                  <Route path="/messages" element={<Messages />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/listings/create" element={<CreateListing />} />
+                  <Route path="/listings/:id/edit" element={<EditListingStub />} />
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </Layout>
+            </SocketProvider>
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </BrowserRouter>
+  );
+}

@@ -1,9 +1,11 @@
 import { Router } from 'express';
+import { createOrder, verifyPaymentController, webhook } from '../controllers/payment.controller.js';
+import { verifyToken } from '../middlewares/auth.middleware.js';
+
 const router = Router();
 
-// Placeholder route
-router.get('/', (req, res) => {
-    res.json({ success: true, message: 'payment route working' });
-});
+router.post('/order', verifyToken, createOrder);
+router.post('/verify', verifyToken, verifyPaymentController);
+router.post('/webhook', webhook);
 
 export default router;
